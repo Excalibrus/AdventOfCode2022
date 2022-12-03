@@ -11,26 +11,27 @@ FileReader reader = new("input.txt");
 List<string> lines = reader.ReadStringLines();
 
 int sum = 0;
+
 foreach (string line in lines)
 {
-  List<char[]> parts = line.Chunk(line.Length / 2).ToList();
-  char[] partOne = parts[0];
-  char[] partTwo = parts[1];
+  char[] partOne = line.Chunk(line.Length / 2).First();
+  char[] partTwo = line.Chunk(line.Length / 2).Last();
 
   char sameItem = partOne.FirstOrDefault(x => partTwo.Contains(x));
-  sum += char.IsUpper(sameItem) ? sameItem - ('A' - upperCaseStarting) : sameItem - ('a' - lowerCaseStarting);
+  sum += CalculateSum(sameItem);
 }
 
 int sumP2 = 0;
-for (int i = 0; i < lines.Count; i++)
+foreach (string[] chunks in lines.Chunk(3))
 {
-  if ((i + 1) % 3 == 0 || i == lines.Count - 1)
-  {
-    List<char> firstTwoLinesMatches = lines[i - 2].Where(x => lines[i - 1].Contains(x)).ToList();
-    char commonMatch = lines[i].FirstOrDefault(x => firstTwoLinesMatches.Contains(x));
-    sumP2 += char.IsUpper(commonMatch) ? commonMatch - ('A' - upperCaseStarting) : commonMatch - ('a' - lowerCaseStarting);
-  }
-  
+  List<char> firstTwoLinesMatches = chunks[0].Where(x => chunks[1].Contains(x)).ToList();
+  char commonMatch = chunks[2].FirstOrDefault(x => firstTwoLinesMatches.Contains(x));
+  sumP2 += CalculateSum(commonMatch);
+}
+
+int CalculateSum(char c)
+{
+  return char.IsUpper(c) ? c - ('A' - upperCaseStarting) : c - ('a' - lowerCaseStarting);
 }
 
 Console.WriteLine($"Part one: {sum}");
