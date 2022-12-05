@@ -1,20 +1,13 @@
 ﻿using System.Diagnostics;
 using Shared;
 
-// Day05.Day5.Solve();
-// return;
-
 Stopwatch sw = new();
 sw.Start();
-FileReader reader = new("input.txt");
+FileReader reader = new();
 List<string> lines = reader.ReadStringLines();
 
-int lastStackModificationNum = 0;
-int lastStackNumOfItems = 0;
-int counter = 1;
-
-bool isP1 = false;
 List<string> stacks = new();
+List<string> stacks2 = new();
 foreach (string line in lines)
 {
   // parsing stacks
@@ -27,10 +20,12 @@ foreach (string line in lines)
       if (stacks.Count < num)
       {
         stacks.Add(string.Empty);
+        stacks2.Add(string.Empty);
       }
       if (!string.IsNullOrWhiteSpace(line[i].ToString()))
       {
-        stacks[num-1] = line[i].ToString() + stacks[num-1];
+        stacks[num-1] = line[i] + stacks[num-1];
+        stacks2[num-1] = line[i] + stacks2[num-1];
       }
 
       i += 4;
@@ -43,53 +38,22 @@ foreach (string line in lines)
     int.TryParse(line.Split("from")[1].Split("to")[0].Trim(), out int from);
     int.TryParse(line.Split("from")[1].Split("to")[1].Trim(), out int to);
 
-    if (isP1)
+    for (int i = 0; i < repetitions; i++)
     {
-      for (int i = 0; i < repetitions; i++)
-      {
-        stacks[to - 1] += stacks[from - 1].Last();
-        stacks[from - 1] = stacks[from - 1][..^1];
-      }  
+      stacks[to - 1] += stacks[from - 1].Last();
+      stacks[from - 1] = stacks[from - 1][..^1];
     }
-    else
-    {
-      drawStacks();
-      Console.WriteLine(counter + " - " + line);
-      counter++;
-      int drawerLength = stacks[from - 1].Length >= repetitions ? repetitions : stacks[from - 1].Length;
-      string movingPart = stacks[from - 1][(stacks[from - 1].Length - drawerLength)..];
-      if (!string.IsNullOrWhiteSpace(movingPart))
-      {
-        lastStackNumOfItems = drawerLength;
-        lastStackModificationNum = to - 1;
-        stacks[to - 1] += movingPart;
-        stacks[from - 1] = stacks[from - 1][..^movingPart.Length]; 
-      }
-    }
+
+    string movingPart = stacks2[from - 1][(stacks2[from - 1].Length - repetitions)..];
+    stacks2[to - 1] += movingPart;
+    stacks2[from - 1] = stacks2[from - 1][..^movingPart.Length]; 
   }
 }
 
-void drawStacks()
-{
-  for (int i = 0; i < stacks.Count; i++)
-  {
-    Console.ForegroundColor = ConsoleColor.White;
-    Console.Write(i + 1 + ": ");
-    for (int j = 0; j < stacks[i].Length; j++)
-    {
-      if (lastStackModificationNum == i && j >= stacks[i].Length - lastStackNumOfItems)
-      {
-        Console.ForegroundColor = ConsoleColor.Red;
-      }
-      Console.Write(stacks[i][j]);
-    }
-    Console.ForegroundColor = ConsoleColor.White;
-    Console.Write("\n");
-  }
-}
-string result = string.Join("", stacks.Select(x => x.Length > 0 ? x.Last().ToString() : " "));
+string resultP1 = string.Join("", stacks.Select(x => x.Length > 0 ? x.Last().ToString() : " "));
+string resultP2 = string.Join("", stacks2.Select(x => x.Length > 0 ? x.Last().ToString() : " "));
 
 sw.Stop();
-Console.WriteLine($"Part one: {result}");
-Console.WriteLine($"Part two: {result}");
+Console.WriteLine($"Part one: {resultP1}");
+Console.WriteLine($"Part two: {resultP2}");
 Console.WriteLine($"Time: {sw.ElapsedMilliseconds}ms");
