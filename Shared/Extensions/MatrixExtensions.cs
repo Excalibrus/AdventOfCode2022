@@ -5,15 +5,29 @@ namespace Shared.Extensions;
 
 public static class MatrixExtensions
 {
-  public static List<MatrixPosition> GetNeighbourPositions(this int[,] matrix, MatrixPosition currentPosition, bool includeDiagonal)
+  public static List<MatrixPosition> GetNeighbourPositions(this int[,] matrix, MatrixPosition currentPosition,
+    bool includeDiagonal)
   {
-    throw new NotImplementedException("not yet");
+    List<MatrixPosition> positions = new();
+    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Up, MatrixDepth.One).First());
+    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Down, MatrixDepth.One).First());
+    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Left, MatrixDepth.One).First());
+    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Right, MatrixDepth.One).First());
+    if (includeDiagonal)
+    {
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.UpLeft, MatrixDepth.One).First());
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.UpRight, MatrixDepth.One).First());
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownLeft, MatrixDepth.One).First());
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownRight, MatrixDepth.One).First());
+    }
+
+    return positions;
   }
 
 
   public static List<MatrixPosition> GetPositionsInDirection(
-    this int[,] matrix, 
-    MatrixPosition currentPosition, 
+    this int[,] matrix,
+    MatrixPosition currentPosition,
     MatrixDirection direction,
     MatrixDepth depth = MatrixDepth.Full)
   {
@@ -77,7 +91,9 @@ public static class MatrixExtensions
 
         break;
       case MatrixDirection.DownRight:
-        for (int r = currentPosition.Row + 1, c = currentPosition.Col + 1; r < matrix.GetLength(0) && c < matrix.GetLength(1); r++, c++)
+        for (int r = currentPosition.Row + 1, c = currentPosition.Col + 1;
+             r < matrix.GetLength(0) && c < matrix.GetLength(1);
+             r++, c++)
         {
           positions.Add(new MatrixPosition(r, c));
           if (NeedToBreak(positions)) break;
