@@ -10,17 +10,15 @@ FileReader reader = new("input.txt");
 List<string> lines = reader.ReadStringLines();
 
 int sampleSize = 1000;
-int p1 = 0;
-int p2 = 0;
+
+List<Rope> ropes = new List<Rope>
+{
+  new Rope(2, sampleSize),
+  new Rope(10, sampleSize)
+};
 
 int[,] matrix = new int[sampleSize, sampleSize];
-MatrixPosition tailPosition = new(sampleSize / 2, sampleSize / 2);
-MatrixPosition headPosition = new(sampleSize / 2, sampleSize / 2);
-List<MatrixPosition> tailHistory = new List<MatrixPosition>();
-tailHistory.Add(tailPosition);
 
-List<MatrixPosition> rope = Enumerable.Range(1, 10).Select(x => new MatrixPosition(sampleSize / 2, sampleSize / 2))
-  .ToList();
 
 foreach (var line in lines)
 {
@@ -28,37 +26,36 @@ foreach (var line in lines)
   MatrixDirection direction = GetDirection(lineParts[0]);
   if (!int.TryParse(lineParts[1], out int numberOfMoves)) throw new Exception("Could not parse");
 
-  Console.WriteLine($"Dir: {lineParts[0]}, Steps: {numberOfMoves}");
+  // Console.WriteLine($"Dir: {lineParts[0]}, Steps: {numberOfMoves}");
   for (int i = 0; i < numberOfMoves; i++)
   {
-    // headPosition = MoveHeadToDirection(headPosition, direction);
-    // Console.WriteLine($"Head: {headPosition}");
-    // tailPosition = MoveTailCloserToHeader(tailPosition, headPosition);
-    // Console.WriteLine($"Tail: {tailPosition}");
-    // p2
-    rope[0] = MoveHeadToDirection(rope[0], direction);
-    for (int tailIndex = 1; tailIndex < rope.Count; tailIndex++)
+    foreach (var rope in ropes)
     {
-      rope[tailIndex] = MoveTailCloserToHeader(rope[tailIndex], rope[tailIndex - 1], tailIndex == rope.Count - 1);
+      rope.Knots[0] = MoveHeadToDirection(rope.Knots[0], direction);
+      for (int tailIndex = 1; tailIndex < rope.Knots.Count; tailIndex++)
+      {
+        rope.Knots[tailIndex] = MoveTailCloserToHeader(
+          rope.Knots[tailIndex],
+          rope.Knots[tailIndex - 1],
+          rope.TailHistory,
+          tailIndex == rope.Knots.Count - 1);
+      }
     }
   }
-
-  // Console.WriteLine($"Head - {headPosition} - Tail - {tailPosition}");
 }
-//
-// foreach (MatrixPosition position in tailHistory.Take(100))
-// {
-//   Console.WriteLine($"X: {position.Row}, Y: {position.Col}");
-// }
 
-p1 = tailHistory.Distinct(new MatrixPositionComparer()).Count();
+int p1 = ropes[0].TailHistory.Distinct(new MatrixPositionComparer()).Count();
+int p2 = ropes[1].TailHistory.Distinct(new MatrixPositionComparer()).Count();
 
 sw.Stop();
 Console.WriteLine($"Part one: {p1}");
 Console.WriteLine($"Part two: {p2}");
 Console.WriteLine($"Time: {sw.ElapsedMilliseconds}ms");
 
-MatrixPosition MoveTailCloserToHeader(MatrixPosition tailPosition, MatrixPosition headPosition,
+MatrixPosition MoveTailCloserToHeader(
+  MatrixPosition tailPosition,
+  MatrixPosition headPosition,
+  List<MatrixPosition> ropeTailHistory,
   bool savePosition = true)
 {
   if (tailPosition == headPosition) return tailPosition;
@@ -85,7 +82,7 @@ MatrixPosition MoveTailCloserToHeader(MatrixPosition tailPosition, MatrixPositio
 
     if (savePosition)
     {
-      tailHistory.Add(newTailPosition);
+      ropeTailHistory.Add(newTailPosition);
     }
 
     return newTailPosition;
@@ -110,4 +107,18 @@ MatrixDirection GetDirection(string direction)
   // if (direction.Equals("l", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Up;
   // if (direction.Equals("r", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Down;
   throw new Exception("Could not parse direction");
+}
+
+class Rope
+{
+  public List<MatrixPosition> Knots { get; set; } = new();
+  public List<MatrixPosition> TailHistory { get; set; } = new();
+
+  public Rope(int knots, int sampleSize)
+  {
+    Knots = Enumerable.Range(1, knots)
+      .Select(x => new MatrixPosition(sampleSize / 2, sampleSize / 2))
+      .ToList();
+    TailHistory.Add(Knots[0]);
+  }
 }
