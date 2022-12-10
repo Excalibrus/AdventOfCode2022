@@ -18,6 +18,10 @@ MatrixPosition tailPosition = new(sampleSize / 2, sampleSize / 2);
 MatrixPosition headPosition = new(sampleSize / 2, sampleSize / 2);
 List<MatrixPosition> tailHistory = new List<MatrixPosition>();
 tailHistory.Add(tailPosition);
+
+List<MatrixPosition> rope = Enumerable.Range(1, 10).Select(x => new MatrixPosition(sampleSize / 2, sampleSize / 2))
+  .ToList();
+
 foreach (var line in lines)
 {
   var lineParts = line.Split(" ");
@@ -27,13 +31,19 @@ foreach (var line in lines)
   Console.WriteLine($"Dir: {lineParts[0]}, Steps: {numberOfMoves}");
   for (int i = 0; i < numberOfMoves; i++)
   {
-    headPosition = MoveHeadToDirection(headPosition, direction);
+    // headPosition = MoveHeadToDirection(headPosition, direction);
     // Console.WriteLine($"Head: {headPosition}");
-    tailPosition = MoveTailCloserToHeader(tailPosition, headPosition);
+    // tailPosition = MoveTailCloserToHeader(tailPosition, headPosition);
     // Console.WriteLine($"Tail: {tailPosition}");
+    // p2
+    rope[0] = MoveHeadToDirection(rope[0], direction);
+    for (int tailIndex = 1; tailIndex < rope.Count; tailIndex++)
+    {
+      rope[tailIndex] = MoveTailCloserToHeader(rope[tailIndex], rope[tailIndex - 1], tailIndex == rope.Count - 1);
+    }
   }
 
-  Console.WriteLine($"Head - {headPosition} - Tail - {tailPosition}");
+  // Console.WriteLine($"Head - {headPosition} - Tail - {tailPosition}");
 }
 //
 // foreach (MatrixPosition position in tailHistory.Take(100))
@@ -48,7 +58,8 @@ Console.WriteLine($"Part one: {p1}");
 Console.WriteLine($"Part two: {p2}");
 Console.WriteLine($"Time: {sw.ElapsedMilliseconds}ms");
 
-MatrixPosition MoveTailCloserToHeader(MatrixPosition tailPosition, MatrixPosition headPosition)
+MatrixPosition MoveTailCloserToHeader(MatrixPosition tailPosition, MatrixPosition headPosition,
+  bool savePosition = true)
 {
   if (tailPosition == headPosition) return tailPosition;
   List<MatrixPosition> headNeighbours = matrix.GetNeighbourPositions(headPosition, MatrixDirection.All);
@@ -72,7 +83,11 @@ MatrixPosition MoveTailCloserToHeader(MatrixPosition tailPosition, MatrixPositio
       throw new Exception("Could not move tail");
     }
 
-    tailHistory.Add(newTailPosition);
+    if (savePosition)
+    {
+      tailHistory.Add(newTailPosition);
+    }
+
     return newTailPosition;
   }
 
