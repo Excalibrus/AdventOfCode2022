@@ -6,20 +6,26 @@ namespace Shared.Extensions;
 public static class MatrixExtensions
 {
   public static List<MatrixPosition> GetNeighbourPositions(this int[,] matrix, MatrixPosition currentPosition,
-    bool includeDiagonal)
+    MatrixDirection direction)
   {
     List<MatrixPosition> positions = new();
-    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Up, MatrixDepth.One).First());
-    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Down, MatrixDepth.One).First());
-    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Left, MatrixDepth.One).First());
-    positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Right, MatrixDepth.One).First());
-    if (includeDiagonal)
-    {
+    if (direction.HasFlag(MatrixDirection.Up))
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Up, MatrixDepth.One).First());
+    if (direction.HasFlag(MatrixDirection.Down))
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Down, MatrixDepth.One).First());
+    if (direction.HasFlag(MatrixDirection.Left))
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Left, MatrixDepth.One).First());
+    if (direction.HasFlag(MatrixDirection.Right))
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Right, MatrixDepth.One).First());
+    if (direction.HasFlag(MatrixDirection.UpLeft))
       positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.UpLeft, MatrixDepth.One).First());
+    if (direction.HasFlag(MatrixDirection.UpRight))
       positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.UpRight, MatrixDepth.One).First());
+    if (direction.HasFlag(MatrixDirection.DownLeft))
       positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownLeft, MatrixDepth.One).First());
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownRight, MatrixDepth.One).First());
-    }
+    if (direction.HasFlag(MatrixDirection.DownRight))
+      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownRight, MatrixDepth.One)
+        .First());
 
     return positions;
   }

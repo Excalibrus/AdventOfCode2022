@@ -1,5 +1,6 @@
 namespace Shared;
 
+[Flags]
 public enum MatrixDirection
 {
   Up = 1,
@@ -9,5 +10,9 @@ public enum MatrixDirection
   Down,
   DownLeft,
   Left,
-  UpLeft
+  UpLeft,
+  
+  Cross = Up | Down | Right | Left,
+  Diagonal = UpLeft | UpRight | DownLeft | DownRight,
+  All = Cross | Diagonal
 }

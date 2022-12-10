@@ -1,6 +1,6 @@
 namespace Shared.Objects;
 
-public class MatrixPosition : IComparable, IEqualityComparer<MatrixPosition>
+public class MatrixPosition : IComparable
 {
   public int Row { get; set; }
   public int Col { get; set; }
@@ -43,18 +43,26 @@ public class MatrixPosition : IComparable, IEqualityComparer<MatrixPosition>
     return Row == pos.Row && Col == pos.Col;
   }
 
+  public override int GetHashCode()
+  {
+    return (Row, Col).GetHashCode();
+  }
+  
+  public override string ToString()
+  {
+    return $"Row: {Row}, Col: {Col}";
+  }
+}
+
+public class MatrixPositionComparer : IEqualityComparer<MatrixPosition>
+{
   public bool Equals(MatrixPosition x, MatrixPosition y)
   {
-    return x.Row == y.Row && x.Col == y.Col;
+    return x.Equals(y);
   }
 
   public int GetHashCode(MatrixPosition obj)
   {
-    return obj.Col.GetHashCode() + obj.Row.GetHashCode();
-  }
-
-  public override string ToString()
-  {
-    return $"Row: {Row}, Col: {Col}";
+    return obj.GetHashCode();
   }
 }
