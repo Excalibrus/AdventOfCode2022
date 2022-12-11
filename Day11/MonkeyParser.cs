@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Day11;
 
 public static class MonkeyParser
@@ -23,7 +25,7 @@ public static class MonkeyParser
       }
       else if (line.Contains("Starting items:"))
       {
-        monkey.Items = line.Split(":")[1].Split(",").Select(int.Parse).ToList();
+        monkey.Items = line.Split(":")[1].Split(",").Select(BigInteger.Parse).ToList();
       }
       else if (line.Contains("Operation"))
       {
