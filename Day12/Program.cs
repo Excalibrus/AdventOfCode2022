@@ -5,20 +5,22 @@ using Shared.Objects;
 
 Stopwatch sw = new();
 sw.Start();
-FileReader reader = new("input_demo.txt");
+FileReader reader = new("input.txt");
 
 List<string> lines = reader.ReadStringLines();
 
 MatrixPosition startPosition = new(0, 0);
 MatrixPosition endPosition = new(0, 0);
 
+List<MatrixPosition> otherStartingPositions = new();
+
 char[,] matrix = new char[lines.Count, lines[0].Length];
-int[,] countMatrix = new int[lines.Count, lines[0].Length];
+int[,] countMatrixInit = new int[lines.Count, lines[0].Length];
 for (int row = 0; row < lines.Count; row++)
 {
   for (int col = 0; col < lines[row].Length; col++)
   {
-    countMatrix[row, col] = int.MaxValue;
+    countMatrixInit[row, col] = int.MaxValue;
     char letter = lines[row][col];
     if (letter == 'S')
     {
@@ -32,20 +34,43 @@ for (int row = 0; row < lines.Count; row++)
     }
     else
     {
+      if (letter == 'a')
+      {
+        otherStartingPositions.Add(new MatrixPosition(row, col));
+      }
       matrix.SetValue(letter, row, col);
     }
   }
 }
 
 int minPath = 500; // int.max for fuller version
-GoToNextPosition(matrix, new List<MatrixPosition> { startPosition });
+GoToNextPosition(matrix, new List<MatrixPosition> { startPosition }, (int[,])countMatrixInit.Clone());
+
+Console.WriteLine($"Part one: {minPath}");
+
+decimal processorUsage = 0.8m;
+int degree = Convert.ToInt32(Math.Ceiling((Environment.ProcessorCount * processorUsage) * (decimal)2.0));
+int processed = 0;
+Parallel.For(0, otherStartingPositions.Count, i =>
+{
+  new ParallelOptions
+  {
+    MaxDegreeOfParallelism = degree
+  };
+  MatrixPosition startingPos = otherStartingPositions[i];
+  processed++;
+  decimal percent = ((decimal)processed / (decimal)otherStartingPositions.Count) * 100;
+  Console.WriteLine($"{processed}/{otherStartingPositions.Count} ({Math.Round(percent, 2)}%))Starting position {startingPos}");
+  GoToNextPosition(matrix, new List<MatrixPosition> { startingPos }, (int[,])countMatrixInit.Clone());
+});
+
 
 sw.Stop();
-Console.WriteLine($"Part one: {minPath}");
-Console.WriteLine($"Part two: {0}");
+
+Console.WriteLine($"Part two: {minPath}");
 Console.WriteLine($"Time: {sw.ElapsedMilliseconds}ms");
 
-void GoToNextPosition(char[,] matrix, List<MatrixPosition> path)
+void GoToNextPosition(char[,] matrix, List<MatrixPosition> path, int[,] countMatrix)
 {
   if (path.Count > minPath) return;
   MatrixPosition fromPosition = path.Last();
@@ -57,6 +82,7 @@ void GoToNextPosition(char[,] matrix, List<MatrixPosition> path)
   {
     return;
   }
+
   // Console.WriteLine($"Depth {path.Count}, Min: {minPath}, Elevation: {matrix[fromPosition.Row, fromPosition.Col]}, Size: {countMatrix[fromPosition.Row, fromPosition.Col]}");
   // if (countMatrix[fromPosition.Row, fromPosition.Col] > path.Count) return;
   List<MatrixPosition> neighbourPositions = matrix.GetNeighbourPositions(fromPosition, MatrixDirection.Cross);
@@ -85,6 +111,6 @@ void GoToNextPosition(char[,] matrix, List<MatrixPosition> path)
 
   foreach (MatrixPosition nextPosition in possibleNextPositions)
   {
-    GoToNextPosition(matrix, new List<MatrixPosition>(path) { nextPosition });
+    GoToNextPosition(matrix, new List<MatrixPosition>(path) { nextPosition }, countMatrix);
   }
 }
