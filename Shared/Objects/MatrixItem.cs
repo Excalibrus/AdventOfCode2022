@@ -29,6 +29,8 @@ public class MatrixPosition : IComparable
 
   public static bool operator !=(MatrixPosition obj1, MatrixPosition obj2)
   {
+    if (obj1 is null && obj2 is null) return false;
+    if (obj1 is null || obj2 is null) return true;
     return  obj1.Row != obj2.Row || obj1.Col != obj2.Col;
   }
 

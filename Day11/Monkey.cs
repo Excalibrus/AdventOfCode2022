@@ -32,7 +32,7 @@ public class Monkey
         worriedLevel = item * (Operation < 0 ? item : Operation);
       }
 
-      BigInteger worriedLevelAfterBored = part == 1 ? worriedLevel / 3 : worriedLevel;
+      BigInteger worriedLevelAfterBored = part == 1 ? worriedLevel/ 3 : worriedLevel;
       inspectionResults.Add((Answers[worriedLevelAfterBored % Divisible == 0], worriedLevelAfterBored));
       
       Items.Remove(item);

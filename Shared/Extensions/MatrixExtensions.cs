@@ -5,34 +5,22 @@ namespace Shared.Extensions;
 
 public static class MatrixExtensions
 {
-  public static List<MatrixPosition> GetNeighbourPositions(this int[,] matrix, MatrixPosition currentPosition,
+  public static List<MatrixPosition> GetNeighbourPositions<T>(this T[,] matrix, MatrixPosition currentPosition,
     MatrixDirection direction)
   {
-    List<MatrixPosition> positions = new();
-    if (direction.HasFlag(MatrixDirection.Up))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Up, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.Down))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Down, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.Left))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Left, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.Right))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.Right, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.UpLeft))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.UpLeft, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.UpRight))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.UpRight, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.DownLeft))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownLeft, MatrixDepth.One).First());
-    if (direction.HasFlag(MatrixDirection.DownRight))
-      positions.Add(matrix.GetPositionsInDirection(currentPosition, MatrixDirection.DownRight, MatrixDepth.One)
-        .First());
-
-    return positions;
+    List<MatrixDirection> regularEnums = Enumerable.Range(0, 8).Select(x => (int)Math.Pow(2, x)).Select(x => (MatrixDirection)x).ToList();
+    return Enum.GetValues(typeof(MatrixDirection))
+      .Cast<MatrixDirection>()
+      .Where(x => regularEnums.Contains(x) && direction.HasFlag(x))
+      .Select(dir =>
+        matrix.GetPositionsInDirection(currentPosition, dir, MatrixDepth.One)
+          .FirstOrDefault())
+      .Where(position => position != null).ToList();
   }
 
 
-  public static List<MatrixPosition> GetPositionsInDirection(
-    this int[,] matrix,
+  public static List<MatrixPosition> GetPositionsInDirection<T>(
+    this T[,] matrix,
     MatrixPosition currentPosition,
     MatrixDirection direction,
     MatrixDepth depth = MatrixDepth.Full)
@@ -118,7 +106,7 @@ public static class MatrixExtensions
     return positions;
   }
 
-  public static bool IsPositionOnEdge(this int[,] matrix, MatrixPosition position)
+  public static bool IsPositionOnEdge<T>(this T[,] matrix, MatrixPosition position)
   {
     return position.Row == 0 ||
            position.Col == 0 ||
