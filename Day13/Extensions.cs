@@ -4,20 +4,24 @@ namespace Day13;
 
 public static class Extensions
 {
-  public static List<Pair> ParsePairs(this List<string> lines)
+  public static List<Pair> ToPairs(this List<Item> items)
   {
-    return lines
-      .Where(x => !string.IsNullOrWhiteSpace(x))
+    return items
       .Chunk(2)
-      .Select(x => x.Take(2).Select(x => JsonNode.Parse(x)))
-      .ToList()
       .Select(x => new Pair
       {
-        Left = x.First().ParseItem(),
-        Right = x.Last().ParseItem()
+        Left = x.First(),
+        Right = x.Last()
       }).ToList();
   }
   
+  public static List<Item> ParseItems(this List<string> lines)
+  {
+    return lines
+      .Where(x => !string.IsNullOrWhiteSpace(x))
+      .Select(x => JsonNode.Parse(x).ParseItem())
+      .ToList();
+  }
   
   public static Result CompareWith(this Item leftItem, Item rightItem)
   {
@@ -64,31 +68,6 @@ public static class Extensions
     return new Item { Items = { leftItem } }.CompareWith(rightItem);
   }
 
-  // private static List<Item> ParseItems(this string input, List<Item> items = new())
-  // {
-  //   char letter = input.First();
-  //   string nextInput = input[1..];
-  //   if (string.IsNullOrWhiteSpace(nextInput))
-  //   {
-  //     Console.WriteLine("ENDING");
-  //     return items;
-  //   }
-  //   if (letter == '[')
-  //   {
-  //     items.Add(new Item
-  //     {
-  //       Items = nextInput.ParseItems()
-  //     });
-  //   }
-  //   else if (letter == ']')
-  //   {
-  //     return items;
-  //   }
-  //   else if (letter == ',')
-  //   {
-  //     
-  //   }
-  // }
 
   private static Item ParseItem(this JsonNode node)
   {
@@ -96,6 +75,7 @@ public static class Extensions
     {
       return new Item()
       {
+        Json = node.ToJsonString(),
         Items = arr.Select(x => x.ParseItem()).ToList()
       };
     }
