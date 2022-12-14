@@ -85,7 +85,7 @@ void GoToNextPosition(char[,] matrix, List<MatrixPosition> path, int[,] countMat
 
   // Console.WriteLine($"Depth {path.Count}, Min: {minPath}, Elevation: {matrix[fromPosition.Row, fromPosition.Col]}, Size: {countMatrix[fromPosition.Row, fromPosition.Col]}");
   // if (countMatrix[fromPosition.Row, fromPosition.Col] > path.Count) return;
-  List<MatrixPosition> neighbourPositions = matrix.GetNeighbourPositions(fromPosition, MatrixDirection.Cross);
+  List<MatrixPosition> neighbourPositions = matrix.GetNeighbourPositions(fromPosition, Direction.Cross);
   List<MatrixPosition> possibleNextPositions = neighbourPositions.Where(x =>
     !path.Contains(x) &&
     matrix[fromPosition.Row, fromPosition.Col] + 1 >= matrix[x.Row, x.Col]

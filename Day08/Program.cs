@@ -44,16 +44,16 @@ Console.WriteLine($"Time: {sw.ElapsedMilliseconds}ms");
 
 bool IsTreeVisible(MatrixPosition position, int treeHeight)
 {
-  bool up = IsTreeVisibleInDirection(position, treeHeight, MatrixDirection.Up);
-  bool right = IsTreeVisibleInDirection(position, treeHeight, MatrixDirection.Right);
-  bool down = IsTreeVisibleInDirection(position, treeHeight, MatrixDirection.Down);
-  bool left = IsTreeVisibleInDirection(position, treeHeight, MatrixDirection.Left);
+  bool up = IsTreeVisibleInDirection(position, treeHeight, Direction.Up);
+  bool right = IsTreeVisibleInDirection(position, treeHeight, Direction.Right);
+  bool down = IsTreeVisibleInDirection(position, treeHeight, Direction.Down);
+  bool left = IsTreeVisibleInDirection(position, treeHeight, Direction.Left);
 
   // Console.WriteLine($"H:{treeHeight}, x:{position.Row}, y:{position.Col}, up: {up}, right:{right}, down:{down}, left:{left}");
   return up || right || down || left;
 }
 
-bool IsTreeVisibleInDirection(MatrixPosition position, int treeHeight, MatrixDirection direction)
+bool IsTreeVisibleInDirection(MatrixPosition position, int treeHeight, Direction direction)
 {
   return matrix
     .GetPositionsInDirection(position, direction)
@@ -61,7 +61,7 @@ bool IsTreeVisibleInDirection(MatrixPosition position, int treeHeight, MatrixDir
     .All(x => x < treeHeight);
 }
 
-int CountVisibleTreesInDirection(MatrixPosition position, int treeHeight, MatrixDirection direction)
+int CountVisibleTreesInDirection(MatrixPosition position, int treeHeight, Direction direction)
 {
   var takeWhile = matrix
     .GetPositionsInDirection(position, direction)
@@ -73,8 +73,8 @@ int CountVisibleTreesInDirection(MatrixPosition position, int treeHeight, Matrix
 
 int MultiplyVisibleTreesInAllDirections(MatrixPosition position, int treeHeight)
 {
-  return CountVisibleTreesInDirection(position, treeHeight, MatrixDirection.Up) *
-         CountVisibleTreesInDirection(position, treeHeight, MatrixDirection.Down) *
-         CountVisibleTreesInDirection(position, treeHeight, MatrixDirection.Right) *
-         CountVisibleTreesInDirection(position, treeHeight, MatrixDirection.Left);
+  return CountVisibleTreesInDirection(position, treeHeight, Direction.Up) *
+         CountVisibleTreesInDirection(position, treeHeight, Direction.Down) *
+         CountVisibleTreesInDirection(position, treeHeight, Direction.Right) *
+         CountVisibleTreesInDirection(position, treeHeight, Direction.Left);
 }

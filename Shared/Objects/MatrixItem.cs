@@ -11,7 +11,6 @@ public class MatrixPosition : IComparable
     Col = col;
   }
 
-
   public int CompareTo(object obj)
   {
     if (obj is MatrixPosition position)

@@ -6,11 +6,11 @@ namespace Shared.Extensions;
 public static class MatrixExtensions
 {
   public static List<MatrixPosition> GetNeighbourPositions<T>(this T[,] matrix, MatrixPosition currentPosition,
-    MatrixDirection direction)
+    Direction direction)
   {
-    List<MatrixDirection> regularEnums = Enumerable.Range(0, 8).Select(x => (int)Math.Pow(2, x)).Select(x => (MatrixDirection)x).ToList();
-    return Enum.GetValues(typeof(MatrixDirection))
-      .Cast<MatrixDirection>()
+    List<Direction> regularEnums = Enumerable.Range(0, 8).Select(x => (int)Math.Pow(2, x)).Select(x => (Direction)x).ToList();
+    return Enum.GetValues(typeof(Direction))
+      .Cast<Direction>()
       .Where(x => regularEnums.Contains(x) && direction.HasFlag(x))
       .Select(dir =>
         matrix.GetPositionsInDirection(currentPosition, dir, MatrixDepth.One)
@@ -22,13 +22,13 @@ public static class MatrixExtensions
   public static List<MatrixPosition> GetPositionsInDirection<T>(
     this T[,] matrix,
     MatrixPosition currentPosition,
-    MatrixDirection direction,
+    Direction direction,
     MatrixDepth depth = MatrixDepth.Full)
   {
     List<MatrixPosition> positions = new();
     switch (direction)
     {
-      case MatrixDirection.Up:
+      case Direction.Up:
         for (int r = currentPosition.Row - 1; r >= 0; r--)
         {
           positions.Add(new MatrixPosition(r, currentPosition.Col));
@@ -36,7 +36,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.Down:
+      case Direction.Down:
         for (int r = currentPosition.Row + 1; r < matrix.GetLength(0); r++)
         {
           positions.Add(new MatrixPosition(r, currentPosition.Col));
@@ -44,7 +44,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.Left:
+      case Direction.Left:
         for (int c = currentPosition.Col - 1; c >= 0; c--)
         {
           positions.Add(new MatrixPosition(currentPosition.Row, c));
@@ -52,7 +52,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.Right:
+      case Direction.Right:
         for (int c = currentPosition.Col + 1; c < matrix.GetLength(1); c++)
         {
           positions.Add(new MatrixPosition(currentPosition.Row, c));
@@ -60,7 +60,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.UpLeft:
+      case Direction.UpLeft:
         for (int r = currentPosition.Row - 1, c = currentPosition.Col - 1; r >= 0 && c >= 0; r--, c--)
         {
           positions.Add(new MatrixPosition(r, c));
@@ -68,7 +68,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.UpRight:
+      case Direction.UpRight:
         for (int r = currentPosition.Row - 1, c = currentPosition.Col + 1; r >= 0 && c < matrix.GetLength(1); r--, c++)
         {
           positions.Add(new MatrixPosition(r, c));
@@ -76,7 +76,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.DownLeft:
+      case Direction.DownLeft:
         for (int r = currentPosition.Row + 1, c = currentPosition.Col - 1; r < matrix.GetLength(0) && c >= 0; r++, c--)
         {
           positions.Add(new MatrixPosition(r, c));
@@ -84,7 +84,7 @@ public static class MatrixExtensions
         }
 
         break;
-      case MatrixDirection.DownRight:
+      case Direction.DownRight:
         for (int r = currentPosition.Row + 1, c = currentPosition.Col + 1;
              r < matrix.GetLength(0) && c < matrix.GetLength(1);
              r++, c++)

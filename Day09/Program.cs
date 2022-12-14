@@ -23,7 +23,7 @@ int[,] matrix = new int[sampleSize, sampleSize];
 foreach (var line in lines)
 {
   var lineParts = line.Split(" ");
-  MatrixDirection direction = GetDirection(lineParts[0]);
+  Direction direction = GetDirection(lineParts[0]);
   if (!int.TryParse(lineParts[1], out int numberOfMoves)) throw new Exception("Could not parse");
 
   // Console.WriteLine($"Dir: {lineParts[0]}, Steps: {numberOfMoves}");
@@ -59,19 +59,19 @@ MatrixPosition MoveTailCloserToHeader(
   bool savePosition = true)
 {
   if (tailPosition == headPosition) return tailPosition;
-  List<MatrixPosition> headNeighbours = matrix.GetNeighbourPositions(headPosition, MatrixDirection.All);
+  List<MatrixPosition> headNeighbours = matrix.GetNeighbourPositions(headPosition, Direction.All);
   if (headNeighbours.All(x => x != tailPosition))
   {
     MatrixPosition? newTailPosition;
     bool moveCross = headPosition.Row == tailPosition.Row || headPosition.Col == tailPosition.Col;
     if (moveCross)
     {
-      List<MatrixPosition> tailNeighbours = matrix.GetNeighbourPositions(tailPosition, MatrixDirection.Cross);
+      List<MatrixPosition> tailNeighbours = matrix.GetNeighbourPositions(tailPosition, Direction.Cross);
       newTailPosition = tailNeighbours.FirstOrDefault(tail => headNeighbours.Contains(tail));
     }
     else
     {
-      List<MatrixPosition> tailNeighbours = matrix.GetNeighbourPositions(tailPosition, MatrixDirection.Diagonal);
+      List<MatrixPosition> tailNeighbours = matrix.GetNeighbourPositions(tailPosition, Direction.Diagonal);
       newTailPosition = tailNeighbours.FirstOrDefault(tail => headNeighbours.Contains(tail));
     }
 
@@ -91,17 +91,17 @@ MatrixPosition MoveTailCloserToHeader(
   return tailPosition;
 }
 
-MatrixPosition MoveHeadToDirection(MatrixPosition position, MatrixDirection direction)
+MatrixPosition MoveHeadToDirection(MatrixPosition position, Direction direction)
 {
   return matrix.GetPositionsInDirection(position, direction, MatrixDepth.One).First();
 }
 
-MatrixDirection GetDirection(string direction)
+Direction GetDirection(string direction)
 {
-  if (direction.Equals("u", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Up;
-  if (direction.Equals("d", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Down;
-  if (direction.Equals("l", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Left;
-  if (direction.Equals("r", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Right;
+  if (direction.Equals("u", StringComparison.InvariantCultureIgnoreCase)) return Direction.Up;
+  if (direction.Equals("d", StringComparison.InvariantCultureIgnoreCase)) return Direction.Down;
+  if (direction.Equals("l", StringComparison.InvariantCultureIgnoreCase)) return Direction.Left;
+  if (direction.Equals("r", StringComparison.InvariantCultureIgnoreCase)) return Direction.Right;
   // if (direction.Equals("u", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Right;
   // if (direction.Equals("d", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Left;
   // if (direction.Equals("l", StringComparison.InvariantCultureIgnoreCase)) return MatrixDirection.Up;

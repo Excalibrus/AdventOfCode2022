@@ -1,7 +1,7 @@
 namespace Shared;
 
 [Flags]
-public enum MatrixDirection
+public enum Direction
 {
   Up = 1 << 0,
   UpRight = 1 << 1,
