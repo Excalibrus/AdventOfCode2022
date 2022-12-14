@@ -5,10 +5,11 @@ using Shared.Extensions;
 
 Stopwatch sw = new();
 sw.Start();
-FileReader reader = new("input_demo.txt");
+FileReader reader = new("input.txt");
 List<string> inputLines = reader.ReadStringLines();
 
-
+bool part1 = false;
+int counter = 0;
 
 List<MaterialPoint> caveMap = new();
 foreach (string inputLine in inputLines)
@@ -43,22 +44,53 @@ foreach (string inputLine in inputLines)
 
 caveMap = caveMap.Distinct().ToList();
 
-int maxRockY = caveMap.OrderByDescending(x => x.Y).First().Y;
+int maxRockY = caveMap.OrderByDescending(x => x.Y).First().Y + (part1 ? 0 : 2);
 
 Point initSandPoint = new(500, 0);
 int p1 = 0;
 bool canLand = true;
+
 while (canLand)
 {
-  MaterialPoint? point = GetSandLanding(new MaterialPoint(initSandPoint, MaterialType.Sand));
-  if (point is null || point == initSandPoint)
+  List<MaterialPoint>? points = GetSandLanding(new MaterialPoint(initSandPoint, MaterialType.Sand));
+  // points.Reverse();
+  if (points.First().SandDirection is Direction.DownLeft)
+  {
+    List<MaterialPoint> leftPoints = points.TakeWhile(x => x.SandDirection == Direction.DownLeft).ToList();
+    if (leftPoints.Count > 1)
+    {
+      leftPoints = leftPoints.Take(leftPoints.Count - 1).ToList();
+    }
+    points = leftPoints;
+  }
+  else if (points.First().SandDirection is Direction.DownRight)
+  {
+    List<MaterialPoint> rightPoints = points.TakeWhile(x => x.SandDirection == Direction.DownRight).ToList();
+    if (rightPoints.Count > 1)
+    {
+      rightPoints = rightPoints.Take(rightPoints.Count - 1).ToList();
+    }
+    points = rightPoints;
+  }
+  else
+  {
+    points = points.Take(1).ToList();
+  }
+  if (points.Count == 0 || points.Last() == initSandPoint)
   {
     canLand = false;
   }
   else
   {
-    caveMap.Add(point);
-    p1++;
+    caveMap.AddRange(points);
+    p1 += points.Count;
+    counter++;
+    if (counter % 1000 == 0)
+    {
+      // DrawCave(p1);
+      WriteProgress(p1);
+    }
+
     // DrawCave(p1);
   }
 }
@@ -69,44 +101,70 @@ sw.Stop();
 
 
 Console.WriteLine($"Part one: {p1}");
-Console.WriteLine($"Part two: {0}");
+Console.WriteLine($"Part two: {p1 + 1}");
 Console.WriteLine($"Time: {sw.Elapsed}");
 
-MaterialPoint? GetSandLanding(MaterialPoint sandPoint)
+List<MaterialPoint> GetSandLanding(MaterialPoint sandPoint)
 {
-  if (sandPoint.Y == maxRockY) return null;
+  if (sandPoint.Y == maxRockY && part1) return new List<MaterialPoint>();
 
   DirectionResult down = NextPointInDirection(sandPoint, Direction.Down);
   if (down.Continue)
   {
-    return GetSandLanding(new MaterialPoint(down.NextPoint, MaterialType.Sand));
-  }
-  
-  DirectionResult left = NextPointInDirection(sandPoint, Direction.DownLeft);
-  if (left.Continue)
-  {
-    return GetSandLanding(new MaterialPoint(left.NextPoint, MaterialType.Sand));
+    List<MaterialPoint> downPoints = GetSandLanding(new MaterialPoint(down.NextPoint, MaterialType.Sand));
+    sandPoint.SandDirection = null;
+    downPoints.Add(sandPoint);
+    return downPoints;
   }
   
   DirectionResult right = NextPointInDirection(sandPoint, Direction.DownRight);
   if (right.Continue)
   {
-    return GetSandLanding(new MaterialPoint(right.NextPoint, MaterialType.Sand));
+    List<MaterialPoint> rightPoints =
+      GetSandLanding(new MaterialPoint(right.NextPoint, MaterialType.Sand, Direction.DownLeft));
+    sandPoint.SandDirection = Direction.DownRight;
+    rightPoints.Add(sandPoint);
+    return rightPoints;
+  }
+  
+  DirectionResult left = NextPointInDirection(sandPoint, Direction.DownLeft);
+  if (left.Continue)
+  {
+    List<MaterialPoint> leftPoints =
+      GetSandLanding(new MaterialPoint(left.NextPoint, MaterialType.Sand, Direction.DownLeft));
+    sandPoint.SandDirection = Direction.DownLeft;
+    leftPoints.Add(sandPoint);
+
+    return leftPoints;
   }
 
-  return sandPoint;
+  return new List<MaterialPoint> { sandPoint };
 }
 
 DirectionResult NextPointInDirection(MaterialPoint sandPoint, Direction direction)
 {
   Point point = sandPoint.GoInDirection(direction);
-  MaterialPoint? downMatPoint = caveMap.FirstOrDefault(x => x == point);
+  MaterialPoint? downMatPoint =
+    part1 || point.Y < maxRockY ? caveMap.FirstOrDefault(x => x == point) : new MaterialPoint(point, MaterialType.Rock);
   return new DirectionResult
   {
     OriginalPoint = sandPoint,
     NextPoint = point,
     NextMaterial = downMatPoint
   };
+}
+
+void WriteProgress(int i)
+{
+  Console.WriteLine(i + ")");
+  List<MaterialPoint> orderedX = caveMap.OrderBy(x => x.X).ToList();
+  List<MaterialPoint> orderedY = caveMap.OrderBy(x => x.Y).ToList();
+  int minY = orderedY.First().Y;
+  int maxY = orderedY.Last().Y;
+  int minX = orderedX.First().X;
+  int maxX = orderedX.Last().X;
+  Console.WriteLine($"X range: {minX}-{maxX}");
+  Console.WriteLine($"Y range: {minY}-{maxY}");
 }
 
 void DrawCave(int i)
