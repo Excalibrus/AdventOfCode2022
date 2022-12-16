@@ -163,6 +163,52 @@ void BruteForceToWin(Valve current, int minute, int maxMinute, int currentPressu
     new List<string>(openedValves) { current.Name });
 }
 
+void BruteForceToWin2(
+  Valve current,
+  int minute,
+  int maxMinute,
+  int currentPressure,
+  Dictionary<int, Valve> openedValves)
+{
+  Console.WriteLine(minute);
+  if (minute == maxMinute)
+  {
+    if (currentPressure > p1)
+    {
+      p1 = currentPressure;
+    }
+
+    return;
+  }
+
+  int pressure = openedValves.Sum(x => x.Value.Rate * (maxMinute - x.Key));
+  if (openedValves.Values.Any(x => x.Name == current.Name))
+  {
+    foreach (string leadsTo in current.LeadsTo)
+    {
+      Valve valve = valves.First(x => x.Name == leadsTo);
+      // if
+    }
+  }
+  foreach (string leadsTo in current.LeadsTo)
+  {
+    Valve valve = valves.First(x => x.Name == leadsTo);
+    BruteForceToWin2(
+      valve,
+      minute + 1,
+      maxMinute,
+      currentPressure + pressure,
+      new Dictionary<int, Valve>(openedValves));
+  }
+
+  BruteForceToWin2(
+    currentValve,
+    minute + 1,
+    maxMinute,
+    currentPressure + pressure,
+    new Dictionary<int, Valve>(openedValves) { { minute, currentValve } });
+}
+
 (decimal rate, int steps) CalculateRateForPath(string from, string to)
 {
   decimal maxRate = 0;
