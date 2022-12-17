@@ -15,13 +15,14 @@ public static class ExtensionMethods
   public static Shape PrepareInitialShapePosition(
     this List<Point> playground,
     Shape shape,
-    WallConfig config)
+    WallConfig config,
+    int spaceBetween = 3)
   {
     int leftXPosition = config.LeftWallX + 3;
     Shape initShape = shape.CreateCopy();
     initShape.MoveX(leftXPosition);
 
-    int bottomPosition = playground.Any() ? playground.Min(x => x.Y) - 4 : config.BottomWallY - 4;
+    int bottomPosition = playground.Any() ? playground.Min(x => x.Y) - (spaceBetween + 1) : config.BottomWallY - (spaceBetween + 1);
 
     int maxY = initShape.Points.Max(x => x.Y);
     int moveY = bottomPosition - maxY;

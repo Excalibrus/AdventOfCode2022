@@ -6,16 +6,21 @@ public class Shape
 {
   public string Name { get; set; }
   public List<Point> Points { get; set; } = new();
+  public int InitialXPosition { get; set; } = 0;
+  public int MaxLeftPositionX { get; set; }
+  public int MaxRightPositionX { get; set; }
 
-  public Shape(string name, params Point[] points)
+  public Shape(string name, int possibleLeft, int possibleRight, params Point[] points)
   {
+    MaxLeftPositionX = possibleLeft;
+    MaxRightPositionX = possibleRight;
     Name = name;
     Points = points.ToList();
   }
 
   public Shape CreateCopy()
   {
-    return new Shape(Name, Points.Select(x => new Point(x.X, x.Y)).ToArray());
+    return new Shape(Name, MaxLeftPositionX, MaxRightPositionX, Points.Select(x => new Point(x.X, x.Y)).ToArray());
   }
 
   public void MoveX(int xPositions)
