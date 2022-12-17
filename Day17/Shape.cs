@@ -4,23 +4,24 @@ namespace Day17;
 
 public class Shape
 {
-  public string Name { get; set; }
-  public List<Point> Points { get; set; } = new();
+  public ShapeType Type { get; set; }
+  public List<PointWithType> Points { get; set; } = new();
   public int InitialXPosition { get; set; } = 0;
   public int MaxLeftPositionX { get; set; }
   public int MaxRightPositionX { get; set; }
 
-  public Shape(string name, int possibleLeft, int possibleRight, params Point[] points)
+  public Shape(ShapeType type, int possibleLeft, int possibleRight, params Point[] points)
   {
     MaxLeftPositionX = possibleLeft;
     MaxRightPositionX = possibleRight;
-    Name = name;
-    Points = points.ToList();
+    Type = type;
+    string key = Guid.NewGuid().ToString();
+    Points = points.Select(x => new PointWithType(x, type) { MatchingKey = key}).ToList();
   }
 
   public Shape CreateCopy()
   {
-    return new Shape(Name, MaxLeftPositionX, MaxRightPositionX, Points.Select(x => new Point(x.X, x.Y)).ToArray());
+    return new Shape(Type, MaxLeftPositionX, MaxRightPositionX, Points.Select(x => new Point(x.X, x.Y)).ToArray());
   }
 
   public void MoveX(int xPositions)
@@ -33,7 +34,7 @@ public class Shape
   
   public void MoveY(int yPositions)
   {
-    foreach (Point point in Points)
+    foreach (PointWithType point in Points)
     {
       point.Y += yPositions;
     }
@@ -55,7 +56,7 @@ public class Shape
     int maxY = Points.Max(x => x.Y);
     for (int y = minY; y <= maxY; y++)
     {
-      List<Point> verticalPoints = Points.Where(point => point.Y == y).ToList();
+      List<Point> verticalPoints = new(Points.Where(point => point.Y == y).ToList());
       yield return direction == Direction.Right
         ? verticalPoints.MaxBy(point => point.X)
         : verticalPoints.MinBy(point => point.X);

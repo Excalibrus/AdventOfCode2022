@@ -13,7 +13,7 @@ public static class ExtensionMethods
   }
 
   public static Shape PrepareInitialShapePosition(
-    this List<Point> playground,
+    this List<PointWithType> playground,
     Shape shape,
     WallConfig config,
     int spaceBetween = 3)
